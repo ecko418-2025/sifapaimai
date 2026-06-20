@@ -1,0 +1,31 @@
+{
+  "region": {
+    "city": "上海市",
+    "district": "浦东新区"
+  },
+  "assetType": "住宅用房",
+  "requireJudicialAuction": true,
+  "lookaheadDays": 45,
+  "includeStatuses": ["即将开始", "正在进行", "已成交", "流拍", "中止", "暂缓", "撤回", "变卖"],
+  "excludeKeywords": ["商铺", "办公", "写字楼", "厂房", "工业", "土地", "单独车位", "车库", "仓储", "设备", "股权", "债权", "租赁权"],
+  "keepResidentialWithParking": true,
+  "priceBucketsWan": [
+    { "id": "under_500", "label": "500 万以下", "min": 0, "max": 500 },
+    { "id": "500_to_1000", "label": "500 万到 1000 万", "min": 500, "max": 1000 },
+    { "id": "over_1000", "label": "1000 万以上", "min": 1000, "max": null }
+  ],
+  "schedule": ["11:00", "23:00"],
+  "detailDelayMs": { "min": 1000, "max": 3000 },
+  "timeoutMinutes": 60,
+  "retryCount": 1,
+  "testModeLimit": 3,
+  "watchCountChange": { "minIncrease": 100, "minPercent": 20 },
+  "newListingDays": 3,
+  "recentEndedDays": 7,
+  "upcomingDays": 3,
+  "riskKeywords": ["租赁", "占用", "腾退", "抵押", "查封", "瑕疵", "清场", "税费", "买受人承担"],
+  "source": {
+    "primary": "ali-auction",
+    "reserved": ["taobao-judicial-auction"]
+  }
+}

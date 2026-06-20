@@ -1,0 +1,2 @@
+0 11 * * * cd /path/to/sifapaimai && npm run fetch >> logs/cron.log 2>&1
+0 23 * * * cd /path/to/sifapaimai && npm run fetch >> logs/cron.log 2>&1

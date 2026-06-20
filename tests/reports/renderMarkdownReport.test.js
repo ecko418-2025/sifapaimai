@@ -61,5 +61,12 @@ describe("renderMarkdownReport", () => {
     expect(report).toContain("## 500 万到 1000 万");
     expect(report).toContain("## 1000 万以上");
     expect(report).toContain("占用");
+    expect(report).toContain("| 标的 | 价格 | 时间 | 热度 | 链接 |");
+    expect(report).toContain("上海市浦东新区丁香路1299弄3号2601室<br>处置：上海市浦东新区人民法院<br>风险：占用");
+    expect(report).toContain("2609.6 万<br>评估 4660 万<br>折扣 56%");
+    expect(report).toContain("2026-06-22 10:00:00<br>即将开始");
+    expect(report).toContain("报名 1<br>围观 430");
+    expect(report).not.toContain("| 标题 / 地址 | 当前价 | 评估价 |");
+    expect(report).not.toContain("### 上海市浦东新区丁香路1299弄3号2601室");
   });
 });

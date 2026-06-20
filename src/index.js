@@ -98,11 +98,13 @@ export async function runFetch({ testMode = false, rootDir = process.cwd(), now 
     changes,
     runInfo: { success: true, runCountToday, hasErrorLog: false }
   });
-  const reportFile = path.join(paths.reportsDir, `浦东住宅法拍每日监控_${dateKey(now)}.md`);
+  const reportFile = path.join(paths.reportsDir, `浦东住宅法拍每日监控_${clock.stamp}.md`);
+  const latestReportFile = path.join(paths.reportsDir, "浦东住宅法拍每日监控_latest.md");
   fs.writeFileSync(reportFile, report, "utf8");
+  fs.writeFileSync(latestReportFile, report, "utf8");
 
-  logger.info("抓取完成", { count: records.length, changes: changes.length, durationMs, reportFile });
-  return { mode: "normal", count: records.length, changes: changes.length, durationMs, snapshotFile, reportFile };
+  logger.info("抓取完成", { count: records.length, changes: changes.length, durationMs, reportFile, latestReportFile });
+  return { mode: "normal", count: records.length, changes: changes.length, durationMs, snapshotFile, reportFile, latestReportFile };
 }
 
 function isAbnormalResult(records, previousLatest) {

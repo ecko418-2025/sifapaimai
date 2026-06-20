@@ -31,16 +31,16 @@ export function renderMarkdownReport({ now = new Date(), config, records = [], c
   lines.push(`- 错误日志：${runInfo.hasErrorLog ? "有" : "无"}`);
   lines.push("");
 
-  appendTable(lines, "最近 3 天新增标的", newListings);
+  appendListingCards(lines, "最近 3 天新增标的", newListings);
   appendChanges(lines, changes);
-  appendTable(lines, "未来 3 天即将开拍", upcoming);
-  appendTable(lines, "最近 7 天结束标的", recentEnded);
+  appendListingCards(lines, "未来 3 天即将开拍", upcoming);
+  appendListingCards(lines, "最近 7 天结束标的", recentEnded);
 
   for (const bucket of config.priceBucketsWan) {
     const bucketRecords = records
       .filter((record) => assignPriceBucket(record.priceWan, config.priceBucketsWan)?.id === bucket.id)
       .sort(compareStartTime);
-    appendTable(lines, bucket.label, bucketRecords);
+    appendListingCards(lines, bucket.label, bucketRecords);
   }
 
   return `${lines.join("\n")}\n`;
@@ -62,7 +62,7 @@ function appendChanges(lines, changes) {
   lines.push("");
 }
 
-function appendTable(lines, title, records) {
+function appendListingCards(lines, title, records) {
   lines.push(`## ${title}`);
   lines.push("");
   if (records.length === 0) {
@@ -70,24 +70,32 @@ function appendTable(lines, title, records) {
     lines.push("");
     return;
   }
-  lines.push("| 标题 / 地址 | 当前价 | 评估价 | 折扣率 | 开拍时间 | 状态 | 报名 | 围观 | 法院 / 处置单位 | 风险 | 链接 |");
-  lines.push("|---|---:|---:|---:|---|---|---:|---:|---|---|---|");
+  lines.push("| 标的 | 价格 | 时间 | 热度 | 链接 |");
+  lines.push("|---|---:|---|---:|---|");
   for (const record of records.sort(compareStartTime)) {
-    lines.push([
-      escapeCell(record.titleRaw ?? record.addressRaw ?? ""),
-      formatWan(record.priceWan),
-      formatWan(record.valuationWan),
-      record.discountRate === null || record.discountRate === undefined ? "" : `${record.discountRate}%`,
-      record.startTime ?? "",
-      record.status ?? "",
-      record.signupCount ?? "",
-      record.watchCount ?? "",
-      escapeCell(record.court ?? ""),
-      escapeCell((record.riskKeywords ?? []).join("、")),
-      record.normalizedUrl ? `[详情](${record.normalizedUrl})` : ""
-    ].join(" | ").replace(/^/, "| ").replace(/$/, " |"));
+    appendListingRow(lines, record);
   }
   lines.push("");
+}
+
+function appendListingRow(lines, record) {
+  const titleParts = [escapeCell(record.titleRaw ?? record.addressRaw ?? "未命名标的")];
+  if (record.court) titleParts.push(`处置：${escapeCell(record.court)}`);
+  if ((record.riskKeywords ?? []).length > 0) titleParts.push(`风险：${escapeCell(record.riskKeywords.join("、"))}`);
+  const priceParts = [
+    formatWan(record.priceWan),
+    `评估 ${formatWan(record.valuationWan)}`,
+    `折扣 ${formatPercent(record.discountRate)}`
+  ];
+  const timeParts = [
+    record.startTime ?? record.endTime ?? "未获取",
+    record.status ?? "未获取"
+  ];
+  const heatParts = [
+    `报名 ${formatCount(record.signupCount)}`,
+    `围观 ${formatCount(record.watchCount)}`
+  ];
+  lines.push(`| ${titleParts.join("<br>")} | ${priceParts.join("<br>")} | ${timeParts.join("<br>")} | ${heatParts.join("<br>")} | ${record.normalizedUrl ? `[详情](${record.normalizedUrl})` : ""} |`);
 }
 
 function countPriceBuckets(records, buckets) {
@@ -132,7 +140,15 @@ function compareStartTime(a, b) {
 }
 
 function formatWan(value) {
-  return value === null || value === undefined ? "" : `${value} 万`;
+  return value === null || value === undefined ? "未获取" : `${value} 万`;
+}
+
+function formatPercent(value) {
+  return value === null || value === undefined ? "未获取" : `${value}%`;
+}
+
+function formatCount(value) {
+  return value === null || value === undefined ? "未获取" : value;
 }
 
 function escapeCell(value) {
